@@ -1,5 +1,7 @@
 # MeanCourseApp
 
+Created with instruction by Udemy Course: [Angular & NodeJs - The MEAN Stack Guide](https://www.udemy.com/angular-2-and-nodejs-the-practical-guide/).
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.2.2.
 
 ## Development server
