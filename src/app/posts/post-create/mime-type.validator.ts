@@ -1,11 +1,18 @@
 import { AbstractControl } from '@angular/forms';
-import { Observable, Observer } from 'rxjs';
+import { Observable, Observer, of } from 'rxjs';
 
 
 // async validator to not block JS execution
 export const mimeType = (
   control: AbstractControl
 ): Promise<{ [key: string]: any }> | Observable<{ [key: string]: any }> => {
+  if (typeof control.value === 'string') {
+    // if the file is a string, it will not make it through the mime_type_check
+    // (ie: when editting posts, the image will only be a string)
+    // this will stop the following FileReader code from executing & permit editted post to be submitted as valid
+    return of(null); // of creates observable (data) immediately
+  }
+
   const file = control.value as File;
   const fileReader = new FileReader();
   const frObs = Observable.create(
@@ -15,7 +22,7 @@ export const mimeType = (
         let header = '';
         let isValid = false;
         for (let i = 0; i < arr.length; i++) {
-          header += arr[0].toString(16);
+          header += arr[i].toString(16);
         }
         switch (header) {
           case '89504e47':

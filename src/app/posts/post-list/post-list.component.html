@@ -4,13 +4,19 @@
     <mat-expansion-panel-header>
         {{ post.title }}
     </mat-expansion-panel-header>
+    <div class="post-image">
+      <img [src]="post.imagePath" [alt]="post.title">
+    </div>
     <p>{{ post.content }}</p>
-    <mat-action-row>
+    <p>Created By: {{ post.creatorEmail }}</p>
+    <mat-action-row *ngIf="userIsAuthenticated && post.creatorId === userId">
       <!-- binding: [routerLink]=['/edit', post.id] describes individual segments of path we want to load -->
         <a mat-button color="primary" [routerLink]="['/edit', post.id]">EDIT</a>
         <button mat-button color="warn" (click)="onDelete(post.id)">DELETE</button>
     </mat-action-row>
   </mat-expansion-panel>
 </mat-accordion>
-
+<mat-paginator [length]="totalPosts" [pageSize]="postsPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)"
+  *ngIf="posts.length > 0">
+</mat-paginator>
 <p class="info-textmat-body-1" *ngIf="posts.length <= 0 && !isLoading">No Posts Yet! :(</p>

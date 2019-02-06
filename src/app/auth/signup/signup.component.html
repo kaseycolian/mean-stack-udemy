@@ -1,0 +1,35 @@
+  <!-- Using the template-driven form instead of Reactive -->
+  <mat-card>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+      <form (submit)="onSignup(signupForm)" #signupForm="ngForm" *ngIf="!isLoading">
+        <mat-form-field>
+          <input
+            matInput
+            type="email"
+            name="email"
+            ngModel
+            #emailInput="ngModel"
+            placeholder="Email Address"
+            required
+            email
+          >
+          <mat-error *ngIf="emailInput.invalid">Please Enter a Valid Email</mat-error>
+          <!-- the mat-error only shoes is the emailInput object isn't valid (required & email (email validator is provided by Angular)) -->
+          </mat-form-field>
+
+          <mat-form-field>
+            <input
+            matInput
+            type="password"
+            name="password"
+            ngModel
+            placeholder="Password"
+            #passwordInput="ngModel"
+            required
+            >
+            <mat-error *ngIf="passwordInput.invalid">Please Enter Valid Password>
+            </mat-error>
+          </mat-form-field>
+        <button mat-raised-button color="accent" type="submit" *ngIf="!isLoading">Signup</button>
+      </form>
+  </mat-card>

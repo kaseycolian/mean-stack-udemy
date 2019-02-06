@@ -1,24 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
-import { ActivatedRoute, ParamMap } from '@angular/router';
 import { mimeType } from './mime-type.validator';
 
 @Component({
-  selector: 'app-post-create',
-  templateUrl: './post-create.component.html',
-  styleUrls: ['./post-create.component.css']
+  selector: "app-post-create",
+  templateUrl: "./post-create.component.html",
+  styleUrls: ["./post-create.component.css"]
 })
 // routing will take you here if create or edit path
 export class PostCreateComponent implements OnInit {
   enteredTitle = '';
   enteredContent = '';
+  submitAttempt = false;
   post: Post;
   isLoading = false;
   form: FormGroup;
   imagePreview: string;
-  private mode = 'create';
+  private mode = "create";
   private postId: string;
 
   constructor(
@@ -54,11 +56,15 @@ export class PostCreateComponent implements OnInit {
           this.post = {
             id: postData._id,
             title: postData.title,
-            content: postData.content
+            content: postData.content,
+            imagePath: postData.imagePath,
+            creatorId: postData.creatorId,
+            creatorEmail: postData.creatorEmail
           };
           this.form.setValue({
             title: this.post.title,
-            content: this.post.content
+            content: this.post.content,
+            image: this.post.imagePath
           });
         }); // coming from front end
       } else {
@@ -82,6 +88,9 @@ export class PostCreateComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
+  submitAttempted(attempt: boolean) {
+    this.submitAttempt = attempt;
+  }
 
   // this will update post if the mode from ngOnInit = edit or addPost if mode=create
   onSavePost() {
@@ -90,16 +99,23 @@ export class PostCreateComponent implements OnInit {
     }
     this.isLoading = true; // don't set back to false as add/update will navigate away from page & this page defaults to isLoading=false
     if (this.mode === 'create') {
-      // this will happen if ngOnInit returns no ide
-      this.postsService.addPost(this.form.value.title, this.form.value.content);
+       this.postsService.addPost(
+        this.form.value.title,
+        this.form.value.content,
+        this.form.value.image
+      );
+      this.form.reset();
     } else {
       // this will happen if ngOnInit returns an id
       this.postsService.updatePost(
         this.postId,
         this.form.value.title,
-        this.form.value.content
+        this.form.value.content,
+        this.form.value.image
       );
+      this.isLoading = false;
+      // set back to false for error handling in case user can figure out how to try to edit a post that's not their own
+      // it will remove the spinner
     }
-    this.form.reset();
   }
 }
