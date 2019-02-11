@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 import { Post } from './post.model';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth/auth.service';
-import { createProviderInstance } from '@angular/core/src/view/provider';
 
 // sending post data from post-create.component to backend
+
+const BACKEND_URL = environment.apiUrl + 'posts';
 
 @Injectable({ providedIn: 'root' })
 export class PostsService {
@@ -20,9 +21,10 @@ export class PostsService {
 
   getPosts(postsPerPage: number, currentPage: number) {
     const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
+    console.log(queryParams);
     this.http
       .get<{ message: string; posts: any; maxPosts: number }>(
-        'http://localhost:3000/api/posts' + queryParams
+        BACKEND_URL + queryParams
       )
       // 'any' as posts type makes it possible to have conflicts from backend & frontend data ie: id & _id
       .pipe(
@@ -75,7 +77,7 @@ export class PostsService {
       imagePath: string;
       creatorId: string;
       creatorEmail: string;
-    }>('http://localhost:3000/api/posts/' + id);
+    }>(BACKEND_URL + '/' + id);
   }
 
   addPost(title: string, content: string, image: File) {
@@ -85,7 +87,7 @@ export class PostsService {
     // this 'image' is the prop trying to be accessed in backend posts.js
     postData.append('image', image, title);
     this.http
-      .post<{ message: string; post: Post }>('http://localhost:3000/api/posts', postData) // this is the post we get back
+      .post<{ message: string; post: Post }>(BACKEND_URL, postData) // this is the post we get back
       .subscribe(responseData => {
         console.log(responseData.message);
         this.navigateToMain();
@@ -115,7 +117,7 @@ export class PostsService {
       };
     }
     this.http
-      .put('http://localhost:3000/api/posts/' + id, postData)
+      .put(BACKEND_URL + '/' + id, postData)
       .subscribe(response => {
         this.navigateToMain();
       });
@@ -123,11 +125,11 @@ export class PostsService {
 
   deletePost(postId: string) {
    return this.http
-      .delete('http://localhost:3000/api/posts/' + postId);
+      .delete(BACKEND_URL + '/' + postId);
   }
 
   navigateToMain() {
-    this.getPosts(10, 1);
+    this.router.navigate(['/']);
   }
 
 }

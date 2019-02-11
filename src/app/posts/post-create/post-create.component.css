@@ -19,3 +19,21 @@ input[type="file"] {
 .image-preview img{
   height: 100%;
 }
+
+#image-error{
+  color: purple;
+
+}
+
+#emphasize {
+  font-weight: bold;
+  animation-name: image-error;
+  animation-duration: 1s;
+  color: purple;
+}
+
+
+@keyframes image-error {
+  from {color: red; }
+  to {color: blue; }
+}

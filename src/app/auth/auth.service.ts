@@ -3,14 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { AuthData } from './auth-data.model';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
-import { tokenToString } from 'typescript';
-// import { constants } from 'os';
+import { environment } from 'src/environments/environment';
+
+const BACKEND_URL = environment.apiUrl + 'user';
 
 @Injectable({ providedIn: 'root' }) // provided on a root level for the project, so it just needs injected (not imported)
 export class AuthService {
   private isAuthenticated = false;
   private token: string;
-  private tokenTimer: NodeJS.Timer;
+  private tokenTimer: any;
   private userId: string; // could create a user model with id
   private authStatusListener = new Subject<boolean>(); // is user authenticated or not?
 
@@ -40,7 +41,7 @@ export class AuthService {
     };
     // make post() to backend with email & pass & subscribe for the response
     this.http
-      .post('http://localhost:3000/api/user/signup', authData)
+      .post(BACKEND_URL + '/signup', authData)
       .subscribe(
         () => {
           // subscribing to the response from the backend, if no error, then login
@@ -60,7 +61,7 @@ export class AuthService {
     };
     this.http
       .post<{ token: string; expiresIn: number; userId: string }>(
-        'http://localhost:3000/api/user/login',
+        BACKEND_URL + '/login',
         authData
       ) // configured post request to be aware of token
       .subscribe(response => {
@@ -90,7 +91,6 @@ export class AuthService {
   autoAuthUser() {
     const authInformation = this.getAuthData();
     if (!authInformation) {
-      // if there's no auth info, just return out of method
       return;
     }
     const now = new Date();

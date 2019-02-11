@@ -1,18 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
 import { mimeType } from './mime-type.validator';
+import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
+import { AngularWaitBarrier } from 'blocking-proxy/built/lib/angular_wait_barrier';
 
 @Component({
-  selector: "app-post-create",
-  templateUrl: "./post-create.component.html",
-  styleUrls: ["./post-create.component.css"]
+  selector: 'app-post-create',
+  templateUrl: './post-create.component.html',
+  styleUrls: ['./post-create.component.css']
 })
 // routing will take you here if create or edit path
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit, OnDestroy {
   enteredTitle = '';
   enteredContent = '';
   submitAttempt = false;
@@ -20,15 +23,23 @@ export class PostCreateComponent implements OnInit {
   isLoading = false;
   form: FormGroup;
   imagePreview: string;
-  private mode = "create";
+  private mode = 'create';
   private postId: string;
+  private authStatusSub: Subscription;
 
   constructor(
     public postsService: PostsService,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
+    public authService: AuthService
   ) {}
   // this will render with existing post if the subscription has an id - if none, it'll be placeholder
   ngOnInit() {
+    this.authStatusSub =  this.authService.getAuthStatusListener().subscribe(
+      authStatus => {
+        this.isLoading = false;
+      }
+    );
+
     this.form = new FormGroup({
       title: new FormControl(null, {
         validators: [Validators.required, Validators.minLength(3)]
@@ -90,11 +101,27 @@ export class PostCreateComponent implements OnInit {
 
   submitAttempted(attempt: boolean) {
     this.submitAttempt = attempt;
+    if (document.getElementById('image-error')) {
+      console.log('here now');
+      const elemId = document.getElementById('image-error');
+      elemId.id = 'emphasize';
+      if (document.getElementById('emphasize')) {
+        console.log('emphasssssss');
+        console.log('emphasize is here');
+        document.getElementById('image-error').removeAttribute('emphasize');
+      }
+    }
+  }
+
+  focused(event: Event) {
+    console.log(event);
+
   }
 
   // this will update post if the mode from ngOnInit = edit or addPost if mode=create
   onSavePost() {
     if (this.form.invalid) {
+      console.log('invalid');
       return;
     }
     this.isLoading = true; // don't set back to false as add/update will navigate away from page & this page defaults to isLoading=false
@@ -117,5 +144,9 @@ export class PostCreateComponent implements OnInit {
       // set back to false for error handling in case user can figure out how to try to edit a post that's not their own
       // it will remove the spinner
     }
+  }
+
+  ngOnDestroy() {
+    this.authStatusSub.unsubscribe();
   }
 }

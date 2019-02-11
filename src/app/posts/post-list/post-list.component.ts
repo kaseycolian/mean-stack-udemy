@@ -15,18 +15,22 @@ import { AuthService } from 'src/app/auth/auth.service';
 export class PostListComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
   isLoading = false;
-  totalPosts = 10;
+  totalPosts: number;
   postsPerPage = 3;
   currentPage = 1;
   pageSizeOptions = [1, 2, 5, 10];
   userIsAuthenticated = false;
   globalPageData: any;
   userId: string;
+  updatedCurrentPage: number;
   private authStatusSubs: Subscription;
   private postsSub: Subscription;
-  paginator = new MatPaginatorIntl;
+  paginator = new MatPaginatorIntl();
 
-  constructor(public postsService: PostsService, private authService: AuthService) {}
+  constructor(
+    public postsService: PostsService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     this.isLoading = true;
@@ -34,17 +38,14 @@ export class PostListComponent implements OnInit, OnDestroy {
     this.userId = this.authService.getUserId();
     this.postsSub = this.postsService
       .getPostUpdateListener()
-      .subscribe((postData:
-        {
-          posts: Post[], // this is subscribing to postsUpdated
-          postCount: number}) => {
+      .subscribe((postData: { posts: Post[]; postCount: number }) => { // this is subscribing to postsUpdated
         this.isLoading = false;
         this.posts = postData.posts;
         this.totalPosts = postData.postCount;
       });
-      this.userIsAuthenticated = this.authService.getIsAuthenticated();
+    this.userIsAuthenticated = this.authService.getIsAuthenticated();
 
-      // this will be needed for logout button
+    // this will be needed for logout button
     this.authStatusSubs = this.authService
       .getAuthStatusListener()
       .subscribe(isAuthenticated => {
@@ -52,8 +53,8 @@ export class PostListComponent implements OnInit, OnDestroy {
         this.userId = this.authService.getUserId(); // would fetch null if user is logging out
       });
   }
-// event attached to listener in page-list.component.html's pagination
-// gives us access to any event happening in the mat-paginator div
+  // event attached to listener in page-list.component.html's pagination
+  // gives us access to any event happening in the mat-paginator div
   onChangedPage(pageData: PageEvent) {
     this.globalPageData = pageData.pageIndex;
     console.log(this.globalPageData);
@@ -66,31 +67,32 @@ export class PostListComponent implements OnInit, OnDestroy {
 
   updatePaginator() {
     this.isLoading = true;
-    this.currentPage = 0;
-    this.postsPerPage = 3;
+    // this.currentPage = 1;
+    // this.postsPerPage = 3;
     this.postsService.getPosts(this.postsPerPage, this.currentPage);
+
+    // bind the click in header.html to paginator in post-list.html
+    // binding will cause the paginator to update with the click from header
+    // will need to set values in method for paginator to update w/ (or just use default)
   }
 
   getPostsPerPage() {
     return this.postsPerPage;
   }
 
-  setPostsPerPage (amount: number) {
-    return this.postsPerPage = amount;
-  }
-
-  setCurrentPage(page: number) {
-    this.currentPage = page;
-    return this.currentPage;
-  }
-
   onDelete(postId: string) {
     this.isLoading = true;
-    this.postsService.deletePost(postId).subscribe(() => {
-      this.postsService.getPosts(this.postsPerPage, this.currentPage);
-    }, () => {
-      this.isLoading = false;
-    });
+
+    this.currentPage = Math.ceil((this.totalPosts - 1) / this.postsPerPage);
+
+    this.postsService.deletePost(postId).subscribe(
+      () => {
+        this.postsService.getPosts(this.postsPerPage, this.currentPage);
+      },
+      () => {
+        this.isLoading = false;
+      }
+    );
   }
 
   ngOnDestroy() {

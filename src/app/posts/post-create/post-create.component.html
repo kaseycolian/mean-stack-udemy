@@ -13,7 +13,7 @@
       <div>
         <button mat-stroked-button type="button" (click)="filePicker.click()">Upload Image
         </button>
-        <mat-error *ngIf="submitAttempt && form.get('image').invalid">Please Include an Image</mat-error>
+        <mat-error id="image-error" class="error" *ngIf="submitAttempt && form.get('image').invalid">Please Include an Image</mat-error>
         <input type="file" #filePicker (change)="onImagePicked($event)">
 
       </div>
