@@ -28,7 +28,7 @@ mongoose.connect('mongodb+srv://kaseycolian:' + process.env.MONGO_ATLAS_PASSWORD
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   // join lets us forward the request to the actual path of the dir
-  app.use('/images', express.static(path.join(__dirname, 'images'))); //allows us to have access to only this directory
+  app.use('/backend/images', express.static(path.join(__dirname, 'images'))); //allows us to have access to only this directory
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

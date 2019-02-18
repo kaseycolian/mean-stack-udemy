@@ -2,6 +2,7 @@
 # development test images
 /backend/images/*
 
+!backend/images/.gitkeep
 
 # compiled output
 /dist

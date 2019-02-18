@@ -6,7 +6,7 @@ exports.createPost = (req, res, next) => {
   const post = new PostEntry({
     title: req.body.title,
     content: req.body.content,
-    imagePath: url + "../images/" + req.file.filename, //be able to enter domain/images & multer will have file property w/ filename
+    imagePath: url + "/backend/images/" + req.file.filename, //be able to enter domain/images & multer will have file property w/ filename
     // this is what's being stored in DB instead of actual image
     // must have "/" on both sides of images to enter & access dir
     creatorId: req.userData.userId,
@@ -44,7 +44,7 @@ exports.savePost = (req, res, next) => {
     // on editting post, if there's a new file, then we know a new image was uploaded
     console.log(`Updating file with: ${req.file}`);
     const url = req.protocol + "://" + req.get("host");
-    imagePath = url + "/images/" + req.file.filename;
+    imagePath = url + "/backend/images/" + req.file.filename;
   }
   const post = new PostEntry({
     _id: req.body.id, // this comes from the incoming Post
@@ -81,7 +81,6 @@ exports.getPosts = (req, res, next) => {
   //can also get router.get
   const postQuery = PostEntry.find(); //default finds all
   // query parms - optional paramenters added to url /api/posts?pagesize=1&page=2
-  // console.log( req.query);
   // express will grab query obj from params in url & querying is done by mongoose
   const pageSize = +req.query.pagesize; // "+" converts string to int like .to_i
   const currentPage = +req.query.page;
