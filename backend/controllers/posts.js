@@ -6,7 +6,7 @@ exports.createPost = (req, res, next) => {
   const post = new PostEntry({
     title: req.body.title,
     content: req.body.content,
-    imagePath: url + "/images/" + req.file.filename, //be able to enter domain/images & multer will have file property w/ filename
+    imagePath: url + "../images/" + req.file.filename, //be able to enter domain/images & multer will have file property w/ filename
     // this is what's being stored in DB instead of actual image
     // must have "/" on both sides of images to enter & access dir
     creatorId: req.userData.userId,

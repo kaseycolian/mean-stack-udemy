@@ -7,7 +7,6 @@ import { PostsService } from '../posts.service';
 import { mimeType } from './mime-type.validator';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
-import { AngularWaitBarrier } from 'blocking-proxy/built/lib/angular_wait_barrier';
 
 @Component({
   selector: 'app-post-create',

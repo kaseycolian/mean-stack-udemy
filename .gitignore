@@ -1,6 +1,6 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 # development test images
-/backend/images
+/backend/images/*
 
 
 # compiled output
